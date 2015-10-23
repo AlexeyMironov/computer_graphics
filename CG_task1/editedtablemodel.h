@@ -15,6 +15,7 @@ struct TData
 
 class EditedTableModel : public QAbstractTableModel
 {
+    Q_OBJECT
 public:
     EditedTableModel(QObject * parent = 0);
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
@@ -27,6 +28,8 @@ public:
     void clear();
     Qt::ItemFlags flags(const QModelIndex & index) const;
     void removeRow(int row);
+signals:
+    void dataChanged();
 private:
     QVector<TData> m_data;
 };

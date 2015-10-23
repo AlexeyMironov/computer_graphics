@@ -29,7 +29,7 @@ int EditedTableModel::rowCount(const QModelIndex & parent) const
 }
 int EditedTableModel::columnCount(const QModelIndex & parent) const
 {
-     parent;
+    parent;
     return 2;
 }
 
@@ -69,6 +69,7 @@ bool EditedTableModel::setData(const QModelIndex & index, const QVariant & value
         {
             m_data[index.row()].population = value.toInt();
         }
+        emit dataChanged();
         return true;
     }
     else
@@ -101,7 +102,6 @@ void EditedTableModel::clear()
 
 Qt::ItemFlags EditedTableModel::flags(const QModelIndex & index) const
 {
-    // call parent flags
     index;
     return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
 }
@@ -112,4 +112,5 @@ void EditedTableModel::removeRow(int row)
     m_data.remove(row);
     endRemoveRows();
 }
+
 

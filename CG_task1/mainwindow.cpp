@@ -6,8 +6,9 @@
 #include <QJsonDocument>
 #include <QJsonValue>
 #include <QJsonObject>
+#include <QFileDialog>
 
-const QString fileName = "Population";
+QString fileName = "Population";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -16,20 +17,31 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     model = new EditedTableModel();
+    QObject::connect(model, SIGNAL(dataChanged()),this, SLOT(on_dataChanged()));
     ui->tableView->setModel(model);
     ui->tableView->setColumnWidth(0, 100);
     ui->tableView->setColumnWidth(1, 150);
     OpenDocument(fileName);
-    nd = nullptr;
 }
 
 MainWindow::~MainWindow()
 {
-    SaveDocument(fileName);
-    delete ui, model;
-    if (nd)
+    //SaveDocument(fileName);
+    if (m_dataChanged)
     {
-        delete nd;
+        auto reply = QMessageBox::question((QWidget*)this, "Table editor",
+                                     "Document was modified. Do you want to save it?",
+                                     (QMessageBox::StandardButtons)(QMessageBox::Yes | QMessageBox::No));
+        if (reply == QMessageBox::Yes)
+        {
+            on_actionSave_Ctrl_S_triggered();
+        }
+    }
+    delete ui;
+    delete model;
+    if (m_newDialog)
+    {
+        delete m_newDialog;
     }
 }
 
@@ -104,11 +116,11 @@ void MainWindow::OpenDocument(QString fileName)
 
 void MainWindow::on_actionInsert_Row_triggered()
 {
-    if (!nd)
+    if (!m_newDialog)
     {
-        nd = new NewRowDialog(this);
+        m_newDialog = new NewRowDialog(this);
     }
-    nd->show();
+    m_newDialog->show();
 }
 
 void MainWindow::on_actionDelete_Row_triggered()
@@ -125,4 +137,87 @@ void MainWindow::on_actionDelete_Row_triggered()
     {
        model->removeRow(*it);
     }
+}
+void MainWindow::on_dataChanged()
+{
+   m_dataChanged = true;
+}
+
+void MainWindow::on_actionSave_Ctrl_S_triggered()
+{
+    if (m_fileName.length() == 0)
+    {
+        m_fileName = QFileDialog::getSaveFileName(this,("Save Document"),QDir::currentPath(),("Json files (*.json);;Any files (*)") );
+    }
+    if (m_fileName.length() > 0)
+    {
+        SaveDocument(m_fileName);
+        m_dataChanged = false;
+    }
+}
+
+void MainWindow::on_actionSave_As_triggered()
+{
+    m_fileName = QFileDialog::getSaveFileName(this,("Save Document"),QDir::currentPath(),("Json files (*.json);;Any files (*)") );
+    if (m_fileName.length() > 0)
+    {
+        SaveDocument(m_fileName);
+        m_dataChanged = false;
+    }
+
+}
+
+void MainWindow::on_actionOpen_Ctrl_O_triggered()
+{
+    if (m_dataChanged)
+    {
+        auto reply = QMessageBox::question((QWidget*)this, "Table editor",
+                                     "Document was modified. Do you want to save it?",
+                                     (QMessageBox::StandardButtons)(QMessageBox::Yes | QMessageBox::No));
+        if (reply == QMessageBox::Yes)
+        {
+            on_actionSave_Ctrl_S_triggered();
+        }
+    }
+
+    m_fileName = QFileDialog::getOpenFileName(this, ("Open File"),QDir::currentPath(),("Json files (*.json);;Any files (*)"));
+
+    if (m_fileName.length() > 0)
+    {
+        //fileName = "";
+        model->clear();
+        model = new EditedTableModel();
+        ui->tableView->setModel(model);
+        ui->tableView->setColumnWidth(0, 100);
+        ui->tableView->setColumnWidth(1, 150);
+        OpenDocument(m_fileName);
+        m_dataChanged = false;
+    }
+}
+
+void MainWindow::on_actionNew_Table_Ctrl_N_triggered()
+{
+    if (m_dataChanged)
+    {
+        auto reply = QMessageBox::question((QWidget*)this, "Table editor",
+                                     "Document was modified. Do you want to save it?",
+                                     (QMessageBox::StandardButtons)(QMessageBox::Yes | QMessageBox::No)| QMessageBox::Cancel);
+        if (reply == QMessageBox::Yes)
+        {
+            on_actionSave_As_triggered();
+        }
+        else if (reply == QMessageBox::Cancel)
+        {
+            return;
+        }
+    }
+
+    //fileName = "";
+    model->clear();
+    model = new EditedTableModel();
+    ui->tableView->setModel(model);
+    ui->tableView->setColumnWidth(0, 100);
+    ui->tableView->setColumnWidth(1, 150);
+    m_dataChanged = true;
+
 }

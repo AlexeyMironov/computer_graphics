@@ -22,7 +22,7 @@ private slots:
 
 private:
     Ui::NewRowDialog *ui;
-    MainWindow *mw;
+    MainWindow *m_window;
 };
 
 #endif // NEWROWDIALOG_H

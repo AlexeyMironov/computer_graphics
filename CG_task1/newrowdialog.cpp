@@ -7,7 +7,7 @@ NewRowDialog::NewRowDialog(QWidget *parent) :
     ui(new Ui::NewRowDialog)
 {
     ui->setupUi(this);
-    mw = dynamic_cast<MainWindow*>(parent);
+    m_window = dynamic_cast<MainWindow*>(parent);
 }
 
 NewRowDialog::~NewRowDialog()
@@ -17,5 +17,5 @@ NewRowDialog::~NewRowDialog()
 
 void NewRowDialog::on_buttonBox_accepted()
 {
-    mw->model->addRow(ui->countryName->toPlainText(), ui->population->value());
+    m_window->model->addRow(ui->countryName->toPlainText(), ui->population->value());
 }
