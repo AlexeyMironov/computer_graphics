@@ -2,7 +2,7 @@
 
 EditedTableModel::EditedTableModel(QObject * parent)
 {
-    parent;
+    (void)parent;
 }
 
 QVariant EditedTableModel::data(const QModelIndex & index, int role) const
@@ -24,12 +24,12 @@ QVariant EditedTableModel::data(const QModelIndex & index, int role) const
 }
 int EditedTableModel::rowCount(const QModelIndex & parent) const
 {
-    parent;
+    (void)parent;
     return m_data.size();
 }
 int EditedTableModel::columnCount(const QModelIndex & parent) const
 {
-    parent;
+   (void)parent;
     return 2;
 }
 
@@ -84,7 +84,7 @@ void EditedTableModel::addRow(const QString &countryName, int population)
     TData ti = {countryName, population};
 
     m_data.push_back(ti);
-
+    emit dataChanged();
     endInsertRows();
 }
 
@@ -102,7 +102,7 @@ void EditedTableModel::clear()
 
 Qt::ItemFlags EditedTableModel::flags(const QModelIndex & index) const
 {
-    index;
+    (void)index;
     return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
 }
 
@@ -110,6 +110,7 @@ void EditedTableModel::removeRow(int row)
 {
     beginRemoveRows(QModelIndex(), row, row);
     m_data.remove(row);
+    emit dataChanged();
     endRemoveRows();
 }
 

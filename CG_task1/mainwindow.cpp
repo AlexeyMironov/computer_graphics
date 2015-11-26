@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "newrowdialog.h"
+#include "diagram.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 #include <QJsonArray>
@@ -112,6 +113,7 @@ void MainWindow::OpenDocument(QString fileName)
         QString countryName = valuePair.keys()[0];
         model->addRow(countryName, valuePair[countryName].toInt());
     }
+     m_dataChanged = false;
 }
 
 void MainWindow::on_actionInsert_Row_triggered()
@@ -121,6 +123,7 @@ void MainWindow::on_actionInsert_Row_triggered()
         m_newDialog = new NewRowDialog(this);
     }
     m_newDialog->show();
+    //on_dataChanged();
 }
 
 void MainWindow::on_actionDelete_Row_triggered()
@@ -137,6 +140,7 @@ void MainWindow::on_actionDelete_Row_triggered()
     {
        model->removeRow(*it);
     }
+   // on_dataChanged();
 }
 void MainWindow::on_dataChanged()
 {
@@ -187,6 +191,7 @@ void MainWindow::on_actionOpen_Ctrl_O_triggered()
         //fileName = "";
         model->clear();
         model = new EditedTableModel();
+        QObject::connect(model, SIGNAL(dataChanged()),this, SLOT(on_dataChanged()));
         ui->tableView->setModel(model);
         ui->tableView->setColumnWidth(0, 100);
         ui->tableView->setColumnWidth(1, 150);
@@ -218,6 +223,12 @@ void MainWindow::on_actionNew_Table_Ctrl_N_triggered()
     ui->tableView->setModel(model);
     ui->tableView->setColumnWidth(0, 100);
     ui->tableView->setColumnWidth(1, 150);
-    m_dataChanged = true;
+    on_dataChanged();
 
+}
+
+void MainWindow::on_actionDiagramm_triggered()
+{
+    m_diagram = new DiagramWindow(this, model);
+    m_diagram->show();
 }

@@ -17,11 +17,14 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     editedtablemodel.cpp \
-    newrowdialog.cpp
+    newrowdialog.cpp \
+    diagramwindow.cpp
 
 HEADERS  += mainwindow.h \
     editedtablemodel.h \
-    newrowdialog.h
+    newrowdialog.h \
+    diagramwindow.h
 
 FORMS    += mainwindow.ui \
-    newrowdialog.ui
+    newrowdialog.ui \
+    diagramwindow.ui
