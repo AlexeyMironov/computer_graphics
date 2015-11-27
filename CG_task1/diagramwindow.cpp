@@ -99,17 +99,17 @@ void DiagramWindow::paintEvent(QPaintEvent *event)
     QLinearGradient gradient(cX - 0.5 * cW, cY + cH / 2, cX + 1.5 * cW, cY + cH / 2);
     gradient.setColorAt(0, Qt::black);
     gradient.setColorAt(1, Qt::white);
-    QLinearGradient gradient_side(cX, cY + cH, cX + cW ,cY + cH);
-    gradient_side.setColorAt(0, Qt::black);
+    QLinearGradient gradientSide(cX, cY + cH, cX + cW ,cY + cH);
+    gradientSide.setColorAt(0, Qt::black);
 
-    double palpha = float(coords.x()) / this->width() * 360;
-    if (palpha > 360)
+    double pAlpha = float(coords.x()) / this->width() * 360;
+    if (pAlpha > 360)
     {
-        palpha = 360;
+        pAlpha = 360;
     }
-    else if (palpha < 0)
+    else if (pAlpha < 0)
     {
-        palpha = 0;
+        pAlpha = 0;
     }
 
     auto data = m_model->getData();
@@ -119,7 +119,7 @@ void DiagramWindow::paintEvent(QPaintEvent *event)
         allPopulation += data[i].population;
     }
 
-    double pdegree = 0;
+    double pDegree = 0;
     QPointF p;
     QVector<QColor> colors = {Qt::red, Qt::green, Qt::blue, Qt::cyan, Qt::magenta, Qt::yellow, Qt::gray};
 
@@ -127,72 +127,64 @@ void DiagramWindow::paintEvent(QPaintEvent *event)
     {
         gradient.setColorAt(0.5, colors[i % 7]);
         painter.setBrush(gradient);
-        pdegree = (data[i].population / allPopulation) * 360;
-        painter.drawPie(cX, cY, cW, cH, palpha * 16, pdegree * 16);
+        pDegree = (data[i].population / allPopulation) * 360;
+        painter.drawPie(cX, cY, cW, cH, pAlpha * 16, pDegree * 16);
 
-        double alphaPrev = Angle360(palpha);
-        int quatPrev = GetQuater(palpha);
+        double alphaPrev = Angle360(pAlpha);
+        int quatPrev = GetQuater(pAlpha);
 
-        palpha += pdegree;
+        pAlpha += pDegree;
 
-        double alphaNext = Angle360(palpha);
-        int quatNext = GetQuater(palpha);
+        double alphaNext = Angle360(pAlpha);
+        int quatNext = GetQuater(pAlpha);
 
         QPainterPath path;
-        p = GetPoint(palpha);
+        p = GetPoint(pAlpha);
 
         if((quatNext == 3 || quatNext == 4) && (quatPrev == 3 || quatPrev == 4))
         {
             if (alphaNext > alphaPrev)
             {
-                QPointF p_old = GetPoint(palpha - pdegree);
-                path.moveTo(p_old.x() - 1, p_old.y());
-                path.arcTo(cX, cY, cW, cH, palpha - pdegree, pdegree);
+                QPointF pOld = GetPoint(pAlpha - pDegree);
+                path.moveTo(pOld.x() - 1, pOld.y());
+                path.arcTo(cX, cY, cW, cH, pAlpha - pDegree, pDegree);
                 path.lineTo(p.x(), p.y() + pW);
-                path.arcTo(cX, cY + pW, cW, cH, palpha, -pdegree);
+                path.arcTo(cX, cY + pW, cW, cH, pAlpha, -pDegree);
             }
             else
             {
                 path.moveTo(cX,cY + cH / 2);
-                path.arcTo(cX, cY, cW, cH, 180 ,Angle360(palpha) - 180);
+                path.arcTo(cX, cY, cW, cH, 180, Angle360(pAlpha) - 180);
                 path.lineTo(p.x(), p.y() + pW);
-                path.arcTo(cX, cY + pW,cW,cH, Angle360(palpha), -Angle360(palpha) + 180);
+                path.arcTo(cX, cY + pW,cW,cH, Angle360(pAlpha), -Angle360(pAlpha) + 180);
                 path.lineTo(cX, cY + cH / 2);
 
                 path.moveTo(p.x(), p.y());
-                path.arcTo(cX, cY, cW, cH, palpha - pdegree, 360 - Angle360(palpha - pdegree));
+                path.arcTo(cX, cY, cW, cH, pAlpha - pDegree, 360 - Angle360(pAlpha - pDegree));
                 path.lineTo(cX + cW, cY + cH/2 + pW);
-                path.arcTo(cX, cY + pW, cW, cH, 0, -360 + Angle360(palpha - pdegree));
+                path.arcTo(cX, cY + pW, cW, cH, 0, -360 + Angle360(pAlpha - pDegree));
              }
         }
         else if((quatNext == 3 || quatNext == 4) && (quatPrev == 1 || quatPrev == 2) && alphaNext > alphaPrev )
         {
             path.moveTo(cX, cY + cH / 2);
-            path.arcTo(cX, cY, cW, cH, 180, Angle360(palpha) - 180);
+            path.arcTo(cX, cY, cW, cH, 180, Angle360(pAlpha) - 180);
             path.lineTo(p.x(), p.y() + pW);
-            path.arcTo(cX, cY + pW, cW, cH, Angle360(palpha), -Angle360(palpha) + 180);
+            path.arcTo(cX, cY + pW, cW, cH, Angle360(pAlpha), -Angle360(pAlpha) + 180);
             path.lineTo(cX, cY + cH / 2);
         }
         else if((quatNext == 1 || quatNext == 2) && (quatPrev == 3 || quatPrev == 4) && alphaNext < alphaPrev)
         {
-            p = GetPoint(palpha - pdegree);
+            p = GetPoint(pAlpha - pDegree);
             path.moveTo(p.x(), p.y());
-            path.arcTo(cX, cY, cW, cH, palpha - pdegree, 360 - Angle360(palpha - pdegree));
+            path.arcTo(cX, cY, cW, cH, pAlpha - pDegree, 360 - Angle360(pAlpha - pDegree));
             path.lineTo(cX + cW, cY + cH / 2 + pW);
-            path.arcTo(cX, cY + pW, cW, cH, 0, -360 + Angle360(palpha - pdegree));
-        }
-        else if((quatNext == 1 || quatNext == 2) && (quatPrev == 1 || quatPrev == 2) && alphaNext < alphaPrev)
-        {
-            path.moveTo(cX, cY + cH / 2);
-            path.arcTo(cX, cY, cW, cH, 180, 180);
-            path.lineTo(cX + cW, cY + cH / 2 + pW);
-            path.arcTo(cX, cY + pW, cW, cH, 0, -180);
-            path.lineTo(cX, cY + cH / 2);
+            path.arcTo(cX, cY + pW, cW, cH, 0, -360 + Angle360(pAlpha - pDegree));
         }
         if (!path.isEmpty())
         {
-            gradient_side.setColorAt(1, colors[i]);
-            painter.setBrush(gradient_side);
+            gradientSide.setColorAt(1, colors[i]);
+            painter.setBrush(gradientSide);
             painter.drawPath(path);
         }
     }
